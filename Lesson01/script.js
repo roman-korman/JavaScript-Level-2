@@ -21,11 +21,6 @@ const renderGoodsList = list => {
   document.querySelector('.goods-list').innerHTML = goodsList.join('');
 }
 
-//Запятая выводится из за метода присоедниенеия контента
-//"= goodsList;" -выводится в виде массива, разделиетем в котором является запятые.
-//"= goodsList.join('');"- Метод join склеивает массив в строку используя в качестве разделителя аргумент.
-//Передавая '' в качестве аргумента мы заменяем его на "ничто"
-
 window.onload = () => {
   renderGoodsList(goods);
 };
