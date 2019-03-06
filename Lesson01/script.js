@@ -9,7 +9,7 @@ const renderGoodsItem = (title, price)=>
   `<div class="goods-item">
     <img src="" alt="">
     <h3>${title}</h3>
-    <p>${price}</p>
+    <p>Цена: ${price}</p>
     <button>Добавить</button>
   </div>`;
 

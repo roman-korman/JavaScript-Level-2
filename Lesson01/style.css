@@ -58,11 +58,11 @@ header {
 
 .goods-item p{
     margin: 0px;
-    margin-left: 20px;
+    text-align: center;
 }
 
 .goods-item button {
-    margin-left: 60px;
+    margin-left: 55px;
     margin-top: 10px;
     color: #212121;
     text-align: center;
