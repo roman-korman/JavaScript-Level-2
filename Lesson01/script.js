@@ -7,14 +7,20 @@ const goods = [
 
 const renderGoodsItem = (title, price)=> 
   `<div class="goods-item">
+    <img src="" alt="">
     <h3>${title}</h3>
     <p>${price}</p>
+    <button>Добавить</button>
   </div>`;
 
 const renderGoodsList = list => {
   const goodsList = list.map(item => renderGoodsItem(item.title, item.price));
   document.querySelector('.goods-list').innerHTML = goodsList.join('');
 }
+
+//Запятая выводится из за метода присоедниенеия контента
+//"= goodsList;" -выводится
+//"= goodsList.join('');"- не выводится
 
 window.onload = () => {
   renderGoodsList(goods);
