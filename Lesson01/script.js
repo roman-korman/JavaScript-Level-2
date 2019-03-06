@@ -7,16 +7,14 @@ const goods = [
   { title: 'Shoes', price: 250 },
 ];
 
-const renderGoodsItem = (title, price)=> {
-  title = title || 'no title';
-  price = price || 'no price';
-  return `<div class="goods-item">
+const renderGoodsItem = (title = 'no title', price = 'no price')=> 
+  `<div class="goods-item">
     <img src="" alt="">
     <h3>${title}</h3>
     <p>Цена: ${price}</p>
     <button>Добавить</button>
   </div>`;
-}
+
 
 const renderGoodsList = list => {
   const goodsList = list.map(item => renderGoodsItem(item.title, item.price));
