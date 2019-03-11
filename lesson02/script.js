@@ -1,3 +1,5 @@
+'use strict';
+
 const goods = [
   { title: 'Shirt', price: 150 },
   { title: 'Shirt2'},
