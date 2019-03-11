@@ -41,13 +41,14 @@ class GoodsList {
 	}
 	/**
 	 * Высчитываю сумму товаров в корзине и создаю HTML фрагмент для вывода суммы и количества
-	 * 
+	 * Если на товар не заданна цена, то в подсчёте цена приравнивается 0 и вывожу предкпреждение
 	 */
 	countTotalPrice() {
 		let sum = 0;
 		for (let i = 0; i < this.goods.length; i++) {
 			if (this.goods[i].price == undefined) {
 				this.goods[i].price = 0;
+				alert('На товар '+ this.goods[i].title + ' не назначена цена');
 			}
 		  sum += this.goods[i].price;
 		}
@@ -62,8 +63,7 @@ class GoodsList {
 		listHtml += goodItem.render()
 	  })
 	  document.querySelector('.goods-list').innerHTML = listHtml;
-	  document.querySelector('.cart-sum').innerHTML = this.countTotalPrice();
-
+	  document.querySelector('.cart-sum').innerHTML = this.countTotalPrice(); //вывожу ячейки со стоимостью и количеством товара корзины
 	}
   }
   
