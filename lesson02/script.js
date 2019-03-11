@@ -19,7 +19,7 @@ class GoodItem {
 	  <h3>${this.title}</h3>
 	  <p>Цена: ${this.price}</p>
 	  <button>Добавить</button>
-		</div>`;
+	  </div>`;
 	}
   }
 /**
@@ -39,13 +39,31 @@ class GoodsList {
 		{ title: 'Shoes', price: 250 }
 	  ]
 	}
+	/**
+	 * Высчитываю сумму товаров в корзине и создаю HTML фрагмент для вывода суммы и количества
+	 * 
+	 */
+	countTotalPrice() {
+		let sum = 0;
+		for (let i = 0; i < this.goods.length; i++) {
+			if (this.goods[i].price == undefined) {
+				this.goods[i].price = 0;
+			}
+		  sum += this.goods[i].price;
+		}
+		return `<div class="countTotalPrice">Общее количество: ${this.goods.length}</div>
+		<div class="countTotalPrice">Общая цена: ${sum}</div>`;
+	  }
+
 	render() {
 	  let listHtml = '';
 	  this.goods.forEach((good) => {
 		const goodItem = new GoodItem(good.title, good.price)
 		listHtml += goodItem.render()
 	  })
-	  document.querySelector('.goods-list').innerHTML = listHtml
+	  document.querySelector('.goods-list').innerHTML = listHtml;
+	  document.querySelector('.cart-sum').innerHTML = this.countTotalPrice();
+
 	}
   }
   
@@ -61,3 +79,4 @@ list.fetchGoods();
 window.onload = () => {
   list.render()
 };
+
