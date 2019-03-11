@@ -18,7 +18,7 @@ class GoodItem {
 	  <img src="" alt="">
 	  <h3>${this.title}</h3>
 	  <p>Цена: ${this.price}</p>
-	  <button>Добавить</button>
+	  <button>Удалить</button>
 	  </div>`;
 	}
   }
