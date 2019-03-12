@@ -9,16 +9,23 @@ class GoodItem {
 	 * @param {Наименование товара с проверкой} title 
 	 * @param {Цена товара с проверкой} price 
 	 */
-	constructor(title = 'no title', price = 'no price') {
+	constructor(title = 'no title', price = 'no price', id) {
 	  this.title = title;
-	  this.price = price;
+		this.price = price;
+		this.id = id;
 	}
 	render() {
-	  return `<div class="goods-item">
+	  // return `<div class="goods-item" id="${this.id}">
+	  // <img src="" alt="">
+	  // <h3>${this.title}</h3>
+	  // <p>Цена: ${this.price}</p>
+	  // <button onclick="GoodsList.deletGood(${this.id})">Удалить</button>
+		// </div>`;
+		return `<div class="goods-item" id="${this.id}">
 	  <img src="" alt="">
 	  <h3>${this.title}</h3>
 	  <p>Цена: ${this.price}</p>
-	  <button>Удалить</button>
+	  <button onclick="document.getElementById(${this.id}).remove();">Удалить</button>
 	  </div>`;
 	}
   }
@@ -31,12 +38,12 @@ class GoodsList {
 	}
 	fetchGoods() {
 	  this.goods = [
-		{ title: 'Shirt', price: 150 },
-		{ title: 'Shirt2'},
-		{ title: 'Socks', price: 50 },
-		{ price: 80 },
-		{ title: 'Jacket', price: 350 },
-		{ title: 'Shoes', price: 250 }
+		{ id: 0, title: 'Shirt', price: 150 },
+		{ id: 1,title: 'Shirt2'},
+		{ id: 2,title: 'Socks', price: 50 },
+		{ id: 3,price: 80 },
+		{ id: 4,title: 'Jacket', price: 350 },
+		{ id: 5,title: 'Shoes', price: 250 }
 	  ]
 	}
 	/**
@@ -54,7 +61,12 @@ class GoodsList {
 		}
 		return `<div class="countTotalPrice">Общее количество: ${this.goods.length}</div>
 		<div class="countTotalPrice">Общая цена: ${sum}</div>`;
-	  }
+		}
+	//так не работает
+	// deletGood(id) {
+	// 	document.getElementById(id).remove();
+	// }
+	
 
 	render() {
 	  let listHtml = '';
