@@ -1,5 +1,31 @@
 'use strict';
+/**
+ * Функция для работы с API
+ * @param {Адрес сервера на который отправляется запрос} url 
+ * @param {Значение, которое нужно получить} callback 
+ */
+function makeGETRequest(url, callback) {
+	let xhr;
+	if (window.XMLHttpRequest) {
+		xhr = new XMLHttpRequest();
+	} else if (window.ActiveXObject) {
+		xhr = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xhr.onreadystatechange = function () {
+		if (xhr.readyState === 4) {
+			callback(xhr.responseText);
+		}
+	}
+	xhr.open('GET', url, true);
+	xhr.send();
+}
 
+
+
+/**
+ * Задаю постоянный адрес для подключения к API заглушке
+ */
+const API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
 /**
  * Объект одного товара, с возможностью вывода информации в виде HTML кода
  */
@@ -10,41 +36,50 @@ class GoodItem {
 	 * @param {Цена товара с проверкой} price 
 	 */
 	constructor(title = 'no title', price = 'no price', id) {
-	  this.title = title;
+		this.title = title;
 		this.price = price;
 		this.id = id;
 	}
 	render() {
-	  // return `<div class="goods-item" id="${this.id}">
-	  // <img src="" alt="">
-	  // <h3>${this.title}</h3>
-	  // <p>Цена: ${this.price}</p>
-	  // <button onclick="GoodsList.deletGood(${this.id})">Удалить</button>
+		// return `<div class="goods-item" id="${this.id}">
+		// <img src="" alt="">
+		// <h3>${this.title}</h3>
+		// <p>Цена: ${this.price}</p>
+		// <button onclick="GoodsList.deletGood(${this.id})">Удалить</button>
 		// </div>`;
 		return `<div class="goods-item" id="${this.id}">
 	  <img src="" alt="">
 	  <h3>${this.title}</h3>
 	  <p>Цена: ${this.price}</p>
-	  <button onclick="document.getElementById(${this.id}).remove();">Удалить</button>
+	  <button>Добавить</button>
 	  </div>`;
 	}
-  }
+}
 /**
  * Объект содержащий список товаров и умеющий выводить на страницу их используя объект GoodItem
  */
 class GoodsList {
 	constructor() {
-	  this.goods = []
+		this.goods = []
 	}
-	fetchGoods() {
-	  this.goods = [
-		{ id: 0, title: 'Shirt', price: 150 },
-		{ id: 1,title: 'Shirt2'},
-		{ id: 2,title: 'Socks', price: 50 },
-		{ id: 3,price: 80 },
-		{ id: 4,title: 'Jacket', price: 350 },
-		{ id: 5,title: 'Shoes', price: 250 }
-	  ]
+	// fetchGoods() {
+	//   this.goods = [
+	// 	{ id: 0, title: 'Shirt', price: 150 },
+	// 	{ id: 1,title: 'Shirt2'},
+	// 	{ id: 2,title: 'Socks', price: 50 },
+	// 	{ id: 3,price: 80 },
+	// 	{ id: 4,title: 'Jacket', price: 350 },
+	// 	{ id: 5,title: 'Shoes', price: 250 }
+	//   ]
+	// }
+	/**
+	 * получение через API списка товара, вместо ранее объявленного массива
+	 */
+	fetchGoods(cb) {
+		makeGETRequest(`${API_URL}/catalogData.json`, (goods) => {
+			this.goods = JSON.parse(goods);
+			cb();
+		})
 	}
 	/**
 	 * Высчитываю сумму товаров в корзине и создаю HTML фрагмент для вывода суммы и количества
@@ -55,40 +90,41 @@ class GoodsList {
 		for (let i = 0; i < this.goods.length; i++) {
 			if (this.goods[i].price == undefined) {
 				this.goods[i].price = 0;
-				alert('На товар '+ this.goods[i].title + ' не назначена цена');
+				alert('На товар ' + this.goods[i].title + ' не назначена цена');
 			}
-		  sum += this.goods[i].price;
+			sum += this.goods[i].price;
 		}
 		return `<div class="countTotalPrice">Общее количество: ${this.goods.length}</div>
 		<div class="countTotalPrice">Общая цена: ${sum}</div>`;
-		}
+	}
 	//так не работает
 	// deletGood(id) {
 	// 	document.getElementById(id).remove();
 	// }
-	
 
 	render() {
-	  let listHtml = '';
-	  this.goods.forEach((good) => {
-		const goodItem = new GoodItem(good.title, good.price)
-		listHtml += goodItem.render()
-	  })
-	  document.querySelector('.goods-list').innerHTML = listHtml;
-	  document.querySelector('.cart-sum').innerHTML = this.countTotalPrice(); //вывожу ячейки со стоимостью и количеством товара корзины
+		let listHtml = '';
+		this.goods.forEach((good) => {
+			const goodItem = new GoodItem(good.product_name, good.price, good.id_product)
+			listHtml += goodItem.render()
+		})
+		document.querySelector('.goods-list').innerHTML = listHtml;
+		document.querySelector('.cart-sum').innerHTML = this.countTotalPrice(); //вывожу ячейки со стоимостью и количеством товара корзины
 	}
-  }
-  
+}
+
 /**
  * Создаю экземпляр класса GoodsList, вызваю для него метод fetchGoods, чтобы записать список товаров в свойство goods
  */
 const list = new GoodsList();
-list.fetchGoods();
+list.fetchGoods(() => {
+	list.render();
+});
 
 /**
  * вызваю render() метода fetchGoods
  */
 window.onload = () => {
-  list.render()
+	list.render()
 };
 
