@@ -35,10 +35,11 @@ class GoodItem {
 	 * @param {Наименование товара с проверкой} title 
 	 * @param {Цена товара с проверкой} price 
 	 */
-	constructor(title = 'no title', price = 'no price', id) {
+	constructor(title = 'no title', price = 'no price', quantity = 0, id) {
 		this.title = title;
 		this.price = price;
 		this.id = id;
+		this.quantity = quantity;
 	}
 	render() {
 		// return `<div class="goods-item" id="${this.id}">
@@ -51,6 +52,7 @@ class GoodItem {
 	  <img src="" alt="">
 	  <h3>${this.title}</h3>
 	  <p>Цена: ${this.price}</p>
+	  <p>Количество: ${this.quantity}</p>
 	  <button>Добавить</button>
 	  </div>`;
 	}
@@ -60,7 +62,9 @@ class GoodItem {
  */
 class GoodsList {
 	constructor() {
-		this.goods = []
+		this.goods = [];
+		this.amount = 0;
+		this.countGoods;
 	}
 	// fetchGoods() {
 	//   this.goods = [
@@ -76,8 +80,10 @@ class GoodsList {
 	 * получение через API списка товара, вместо ранее объявленного массива
 	 */
 	fetchGoods(cb) {
-		makeGETRequest(`${API_URL}/catalogData.json`, (goods) => {
-			this.goods = JSON.parse(goods);
+		makeGETRequest(`${API_URL}/getBasket.json`, (goods) => {
+			this.goods = JSON.parse(goods).contents;
+			this.amount = JSON.parse(goods).amount;
+			this.countGoods = JSON.parse(goods).countGoods;
 			cb();
 		})
 	}
@@ -86,16 +92,8 @@ class GoodsList {
 	 * Если на товар не заданна цена, то в подсчёте цена приравнивается 0 и вывожу предкпреждение
 	 */
 	countTotalPrice() {
-		let sum = 0;
-		for (let i = 0; i < this.goods.length; i++) {
-			if (this.goods[i].price == undefined) {
-				this.goods[i].price = 0;
-				alert('На товар ' + this.goods[i].title + ' не назначена цена');
-			}
-			sum += this.goods[i].price;
-		}
-		return `<div class="countTotalPrice">Общее количество: ${this.goods.length}</div>
-		<div class="countTotalPrice">Общая цена: ${sum}</div>`;
+		return `<div class="countTotalPrice">Общее количество: ${this.countGoods}</div>
+		<div class="countTotalPrice">Общая цена: ${this.amount}</div>`;
 	}
 	//так не работает
 	// deletGood(id) {
@@ -105,7 +103,7 @@ class GoodsList {
 	render() {
 		let listHtml = '';
 		this.goods.forEach((good) => {
-			const goodItem = new GoodItem(good.product_name, good.price, good.id_product)
+			const goodItem = new GoodItem(good.product_name, good.price, good.quantity, good.id_product)
 			listHtml += goodItem.render()
 		})
 		document.querySelector('.goods-list').innerHTML = listHtml;
