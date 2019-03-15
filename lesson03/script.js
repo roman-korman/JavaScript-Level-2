@@ -19,8 +19,26 @@ function makeGETRequest(url, callback) {
 	xhr.open('GET', url, true);
 	xhr.send();
 }
-
-
+/**
+ * не получилось перейти на промис
+ */
+// const makeGETRequest = (url) => {
+// 	return new Promise(function (resolve, reject) {
+// 		let xhr = new XMLHttpRequest();
+// 		xhr.open('GET', url);
+// 		xhr.onload = function () {
+// 			if (xhr.readyState === 4) {
+// 				// Если успешный, то резолвим промис
+// 				resolve(xhr.responseText);
+// 			} else {
+// 				// Если нет, то реджектим промис
+// 				allert('ошибко');
+// 				reject('Error');
+// 			}
+// 		}
+// 		xhr.send();
+// 	});
+// };
 
 /**
  * Задаю постоянный адрес для подключения к API заглушке
@@ -53,7 +71,7 @@ class GoodItem {
 	  <h3>${this.title}</h3>
 	  <p>Цена: ${this.price}</p>
 	  <p>Количество: ${this.quantity}</p>
-	  <button>Добавить</button>
+	  <button>Удалить</button>
 	  </div>`;
 	}
 }
@@ -88,6 +106,21 @@ class GoodsList {
 		})
 	}
 	/**
+	 * не получилось перейти на промис
+	 */
+	// fetchGoods() {
+	// 	makeGETRequest(`${API_URL}/getBasket.json`).then((goods) => {
+	// 		this.goods = JSON.parse(goods).contents;
+	// 		this.amount = JSON.parse(goods).amount;
+	// 		this.countGoods = JSON.parse(goods).countGoods;
+	// 	}, (error) => {
+	// 		console.log(error)
+	// 	}
+	// 	);
+	// }
+
+
+	/**
 	 * Высчитываю сумму товаров в корзине и создаю HTML фрагмент для вывода суммы и количества
 	 * Если на товар не заданна цена, то в подсчёте цена приравнивается 0 и вывожу предкпреждение
 	 */
@@ -95,10 +128,7 @@ class GoodsList {
 		return `<div class="countTotalPrice">Общее количество: ${this.countGoods}</div>
 		<div class="countTotalPrice">Общая цена: ${this.amount}</div>`;
 	}
-	//так не работает
-	// deletGood(id) {
-	// 	document.getElementById(id).remove();
-	// }
+
 
 	render() {
 		let listHtml = '';
