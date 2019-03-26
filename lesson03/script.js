@@ -1,49 +1,29 @@
 'use strict';
 /**
- * Функция для работы с API
- * @param {Адрес сервера на который отправляется запрос} url 
- * @param {Значение, которое нужно получить} callback 
+ * Функция для работы с API через промис
+ * @param {Адрес json файла на который отправляется запрос} url
  */
-function makeGETRequest(url, callback) {
-	let xhr;
-	if (window.XMLHttpRequest) {
-		xhr = new XMLHttpRequest();
-	} else if (window.ActiveXObject) {
-		xhr = new ActiveXObject("Microsoft.XMLHTTP");
-	}
-	xhr.onreadystatechange = function () {
-		if (xhr.readyState === 4) {
-			callback(xhr.responseText);
+function makeGETRequest(url) {
+	return new Promise((resolve, reject) => {
+		const xhr = window.XMLHttpRequest
+			? new window.XMLHttpRequest() : new window.ActiveXObject()
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState === 4) {
+				//if (xhr.Status === 200) {
+				resolve(xhr.responseText);
+				//}
+				reject(new Error())
+			}
 		}
-	}
-	xhr.open('GET', url, true);
-	xhr.send();
+		xhr.open('GET', url, true)
+		xhr.send()
+	})
 }
-/**
- * не получилось перейти на промис
- */
-// const makeGETRequest = (url) => {
-// 	return new Promise(function (resolve, reject) {
-// 		let xhr = new XMLHttpRequest();
-// 		xhr.open('GET', url);
-// 		xhr.onload = function () {
-// 			if (xhr.readyState === 4) {
-// 				// Если успешный, то резолвим промис
-// 				resolve(xhr.responseText);
-// 			} else {
-// 				// Если нет, то реджектим промис
-// 				allert('ошибко');
-// 				reject('Error');
-// 			}
-// 		}
-// 		xhr.send();
-// 	});
-// };
 
 /**
  * Задаю постоянный адрес для подключения к API заглушке
  */
-const API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
+const API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses/';
 /**
  * Объект одного товара, с возможностью вывода информации в виде HTML кода
  */
@@ -60,18 +40,12 @@ class GoodItem {
 		this.quantity = quantity;
 	}
 	render() {
-		// return `<div class="goods-item" id="${this.id}">
-		// <img src="" alt="">
-		// <h3>${this.title}</h3>
-		// <p>Цена: ${this.price}</p>
-		// <button onclick="GoodsList.deletGood(${this.id})">Удалить</button>
-		// </div>`;
 		return `<div class="goods-item" id="${this.id}">
 	  <img src="" alt="">
 	  <h3>${this.title}</h3>
 	  <p>Цена: ${this.price}</p>
 	  <p>Количество: ${this.quantity}</p>
-	  <button>Удалить</button>
+	  <button onclick="list.deletGood(${this.id})">Удалить</button>
 	  </div>`;
 	}
 }
@@ -84,45 +58,44 @@ class GoodsList {
 		this.amount = 0;
 		this.countGoods;
 	}
-	// fetchGoods() {
-	//   this.goods = [
-	// 	{ id: 0, title: 'Shirt', price: 150 },
-	// 	{ id: 1,title: 'Shirt2'},
-	// 	{ id: 2,title: 'Socks', price: 50 },
-	// 	{ id: 3,price: 80 },
-	// 	{ id: 4,title: 'Jacket', price: 350 },
-	// 	{ id: 5,title: 'Shoes', price: 250 }
-	//   ]
-	// }
 	/**
 	 * получение через API списка товара, вместо ранее объявленного массива
 	 */
-	fetchGoods(cb) {
-		makeGETRequest(`${API_URL}/getBasket.json`, (goods) => {
+
+	async fetchGoods() {
+		makeGETRequest(`${API_URL}getBasket.json`).then((goods) => {
 			this.goods = JSON.parse(goods).contents;
 			this.amount = JSON.parse(goods).amount;
 			this.countGoods = JSON.parse(goods).countGoods;
-			cb();
-		})
+			list.render();
+		}, (err) => {
+			console.error(err)
+		}
+		);
 	}
 	/**
-	 * не получилось перейти на промис
+	 * функция удаления товара из корзины с подверждением от бэка
+	 * добавил вывод предупреждений т.к. просто удалить товар не могу
+	 * @param {id товара для удаления} id 
 	 */
-	// fetchGoods() {
-	// 	makeGETRequest(`${API_URL}/getBasket.json`).then((goods) => {
-	// 		this.goods = JSON.parse(goods).contents;
-	// 		this.amount = JSON.parse(goods).amount;
-	// 		this.countGoods = JSON.parse(goods).countGoods;
-	// 	}, (error) => {
-	// 		console.log(error)
-	// 	}
-	// 	);
-	// }
+	deletGood(id) {
+		makeGETRequest(`${API_URL}deleteFromBasket.json`).then((result) => {
+			if (JSON.parse(result).result == true) {
+				alert('товар удалён');
+				list.fetchGoods();
+			}
+			else {
+				alert('произошла ошибка');
+			}
+		}, (err) => {
+			console.error(err)
+		}
+		);
+	}
 
 
 	/**
-	 * Высчитываю сумму товаров в корзине и создаю HTML фрагмент для вывода суммы и количества
-	 * Если на товар не заданна цена, то в подсчёте цена приравнивается 0 и вывожу предкпреждение
+	 * Вывожу сумму товара и количество товара
 	 */
 	countTotalPrice() {
 		return `<div class="countTotalPrice">Общее количество: ${this.countGoods}</div>
@@ -145,9 +118,7 @@ class GoodsList {
  * Создаю экземпляр класса GoodsList, вызваю для него метод fetchGoods, чтобы записать список товаров в свойство goods
  */
 const list = new GoodsList();
-list.fetchGoods(() => {
-	list.render();
-});
+list.fetchGoods();
 
 /**
  * вызваю render() метода fetchGoods
